@@ -5,9 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"sync"
-
-	//"github.com/sidhaler/wrt/WrittingContent"
-	Miniworkers "github.com/sidhaler/wrt/MiniWorkers"
 )
 
 func Iserr(err error) {
@@ -17,33 +14,14 @@ func Iserr(err error) {
 	}
 }
 
-func IsFilleAv(path *string, con *string, wg *sync.WaitGroup) {
-	_, err := os.Lstat(*path)
-	if err != nil {
-		fmt.Println("File isn't created yet, wanna do it rn ?[Y,y/N,n] : ")
-		var ans string
-		fmt.Scanln(&ans)
-		switch ans {
-		case "Y", "y":
-			os.Create(*path)
-		case "N", "n":
-			os.Exit(00)
-		}
-		obj := new(Miniworkers.FakeWorkers)
-		Wri
-		//WrittingContent.FakeWorker(con, wg, path)
-	}
-
-}
-
-func Readfromfile(hey string) {
+func Readfromfile(hey string) string {
 	data, err := ioutil.ReadFile(hey)
 	Iserr(err)
-	fmt.Println(string(data))
+	return string(data)
 }
 
 func FastRead(target string, wg *sync.WaitGroup, c chan []byte) {
-	defer wg.Done()
+	wg.Done()
 	data, err := ioutil.ReadFile(target)
 	Iserr(err)
 	c <- data

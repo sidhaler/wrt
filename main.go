@@ -30,11 +30,11 @@ func Iserr(err error) {
 func main() {
 	arg.MustParse(&args)
 	wg := new(sync.WaitGroup)
-	wg.Add(1)
-	ReadFile.IsFilleAv(&args.FilePath, &args.ContentorNextFile, wg)
-
+	wg.Add(2)
+	go FileAlive(args.FilePath, wg, args.ContentorNextFile)
+	wg.Wait()
 	// YEP
-	if args.CopyContent == true {
+	if args.CopyContent {
 		datachannel := make(chan []byte, 4)
 		wg.Add(3)
 		go CopyWorker(args.FilePath, args.ContentorNextFile, wg, datachannel)
@@ -44,20 +44,23 @@ func main() {
 		defer close(datachannel)
 	}
 	// XD
-	if args.Sc == true {
+	if args.Sc {
 		wg.Add(1)
-		go ReadWorker(args.FilePath, wg)
+		hey := ReadWorker(args.FilePath, wg)
 		wg.Wait()
+		fmt.Println(hey)
+		os.Exit(00)
 	}
-	wg.Add(1)
-	go WrittingWorker(&args.FilePath, wg, &args.ContentorNextFile)
-	wg.Wait()
+	if len(args.ContentorNextFile) > 0 {
+		oldcontent := ReadWorker(args.FilePath, wg)
+		WrittingContent.WritetoOld(args.ContentorNextFile, args.FilePath, oldcontent)
+	}
 }
 
 //READING AND DISPLAYING CONTENT OF FILE
-func ReadWorker(p string, wg *sync.WaitGroup) {
+func ReadWorker(p string, wg *sync.WaitGroup) string {
 	wg.Done()
-	ReadFile.Readfromfile(p)
+	return ReadFile.Readfromfile(p)
 }
 
 //MOST INSANE THING I EVER DID IN GO, and I don't even know how it works :0
@@ -70,9 +73,9 @@ func CopyWorker(src string, dst string, wg *sync.WaitGroup, datach chan []byte) 
 }
 
 //WRITE CONTENT
-func WrittingWorker(target *string, wg *sync.WaitGroup, content *string) {
+func FileAlive(target string, wg *sync.WaitGroup, content string) {
 	wg.Done()
-	go WrittingContent.Write(content, target)
+	WrittingContent.IsFilleAv(target, content, wg)
 	//fmt.Println("Content has been succesfully written into file")
-	wg.Wait()
+
 }

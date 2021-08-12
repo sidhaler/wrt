@@ -16,7 +16,7 @@ func isErr(err error) {
 }
 
 func CopytoFile(pathto1 string, pathto2 string, wg *sync.WaitGroup, c chan []byte) {
-	defer wg.Done()
+	wg.Done()
 	dd := <-c
 	perms := ReadFile.ReadPerm(pathto2)
 	ioutil.WriteFile(pathto2, dd, perms)
