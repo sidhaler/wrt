@@ -1,24 +1,28 @@
 package CopyContent
 
 import (
-	"fmt"
 	"io/ioutil"
-	"time"
+	"log"
+	"os"
+	"sync"
 
 	"github.com/sidhaler/wrt/ReadFile"
 )
 
-func CopytoFile(pathto1 string, pathto2 string) {
-	var dd []byte
-	//res := make(chan []byte, 1)
-	ReadFile.Readfromfile(pathto1)
-	time.Sleep(time.Second * 5)
-	fmt.Println(string(dd))
-	// go WriteTo(pathto2, dd)
+func isErr(err error) {
+	if err != nil {
+		log.Fatal("We got unexpected Error while copying")
+	}
 }
 
-func WriteTo(path string, c []byte) {
-	hello := ReadFile.ReadPerm(path)
-	//defer close(c)
-	ioutil.WriteFile(path, c, hello)
+func CopytoFile(pathto1 string, pathto2 string, wg *sync.WaitGroup, c chan []byte) {
+	defer wg.Done()
+	dd := <-c
+	perms := ReadFile.ReadPerm(pathto2)
+	ioutil.WriteFile(pathto2, dd, perms)
+}
+
+func MoveFile(src *string, dst *string) {
+	err := os.Rename(*src, *dst)
+	isErr(err)
 }
