@@ -36,7 +36,7 @@ func main() {
 	// YEP
 	if args.CopyContent {
 		datachannel := make(chan []byte, 4)
-		wg.Add(3)
+		wg.Add(6)
 		go CopyWorker(args.FilePath, args.ContentorNextFile, wg, datachannel)
 		go CopyWorker(args.FilePath, args.ContentorNextFile, wg, datachannel)
 
@@ -52,8 +52,10 @@ func main() {
 		os.Exit(00)
 	}
 	if len(args.ContentorNextFile) > 0 {
+		wg.Add(1)
 		oldcontent := ReadWorker(args.FilePath, wg)
 		WrittingContent.WritetoOld(args.ContentorNextFile, args.FilePath, oldcontent)
+		wg.Wait()
 	}
 }
 
